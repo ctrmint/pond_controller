@@ -14,8 +14,8 @@ import time
 
 
 # WIFIConfiguration Constants
-SSID = 'blank'
-PASSWORD = 'blank'
+SSID = "barpbarp6"
+PASSWORD = "1qazxsw23edcvfr4"
 # PIN for I2C sensor(s)
 SENSE_PIN = 16
 # Onboard sensor ref
@@ -221,7 +221,7 @@ while not roms:
     roms = ds_sensor.scan()
     
 try:
-    ip = connect_to_wifi("", "")
+    ip = connect_to_wifi(SSID, PASSWORD)
     #print(ip)
     time.sleep(5)
 except:
