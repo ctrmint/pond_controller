@@ -1,1 +1,3 @@
-# pond_controller
+# Pond Pico Controller
+## About
+ 
