@@ -221,7 +221,7 @@ while not roms:
     roms = ds_sensor.scan()
     
 try:
-    ip = connect_to_wifi("barpbarp6", "1qazxsw23edcvfr4")
+    ip = connect_to_wifi("", "")
     #print(ip)
     time.sleep(5)
 except:
