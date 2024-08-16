@@ -14,8 +14,7 @@ import time
 
 
 # WIFIConfiguration Constants
-SSID = "barpbarp6"
-PASSWORD = "1qazxsw23edcvfr4"
+WIFI_SETTINGS_FILE = 'wifi_settings.txt'
 # PIN for I2C sensor(s)
 SENSE_PIN = 16
 # Onboard sensor ref
@@ -49,15 +48,6 @@ def get_value_from_dict(dictionary, key):
     :return: The value associated with the key, or None if the key is not found.
     """
     return dictionary.get(key, None)
-
-
-def flasher(led, delay_ms, times):
-    while times > 0:
-        led.off()
-        time.sleep_ms(delay_ms)
-        led.on()
-        times = times - 1
-    return
 
 
 def external_sensors(roms, ds_sensor):
@@ -147,6 +137,41 @@ def str_roms(roms):
     return {"roms": rom_array}
 
 
+def exec_action(action):
+    """
+    Function to process action commands sent via a POST.
+    Filters action type (atype) and call relevant functions based on name,
+    This needs to be refactored so that its more sophisticated. 
+    """
+    if action.get('type'):
+        atype = action['type']
+    
+        if action.get('params'):
+            params = action['params']
+        else:
+            params = None
+        
+        if atype == "onboard_led":
+            response = onboardLED(params)
+    
+    else:
+        print("no action")
+    
+    return
+
+
+def onboardLED(params):
+    """
+    onboard LED action function call
+    Do some stuff with the onboard LED.
+    Used to experiment with POST functionality in the API
+    """
+    if params == "on":
+        led.on()
+    if params == "off":
+        led.off()
+    return
+
 ### API Endpoints
 @server.route("/api/control-led", methods=["POST"])
 def ledCommand(request):
@@ -198,6 +223,18 @@ def about(request):
     return json.dumps(ABOUT), 200, {"Content-Type": "application/json"}
 
 
+@server.route("/api/action", methods=["POST"])
+def action(request):
+    print("starting action")
+    action_json = {None: None}
+    action = request.data
+    if isinstance(action, dict):
+        if 'type' in action:
+            action_json = action
+            exec_action(action)
+    return json.dumps(action_json), 200, {"Content-Type": "application/json"}
+
+
 @server.route("/api/toggle_led", methods=["GET"])
 def toggle_led(request):
     """
@@ -219,9 +256,22 @@ roms = None
 while not roms:
     ds_sensor = init_sensor(SENSE_PIN)
     roms = ds_sensor.scan()
-    
+
+# Get Wifi setting from file
 try:
-    ip = connect_to_wifi(SSID, PASSWORD)
+    with open(WIFI_SETTINGS_FILE, 'r') as file:
+        wifi_json = json.load(file)
+except Exception as e:
+    print(e)
+
+# dynamically define kv based on wifi input file
+# keys should be wifi_ssid, wifi_password, buffer_size, and port
+# see READ.me
+for key, value in wifi_json.items():
+    globals()[key] = value
+
+try:
+    ip = connect_to_wifi(wifi_ssid, wifi_password)
     #print(ip)
     time.sleep(5)
 except:
