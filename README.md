@@ -18,8 +18,8 @@ A single 4.7kΩ pull up resistor is required, along with 3 DS18x20 temperature s
 Wiring is as follows; 
 The DS18x20 sensor has three pins: VCC, GND, and Data.
 Connect the VCC pin of the DS18x20 to the 3.3V pin on the Pico (e.g., Pin 36).
-Connect the GND pin of the DS18x20 to one of the GND pins on the Pico (e.g., Pin 38).
+Connect the GND pin of the DS18x20 to one of the GND pins on the Pico (e.g., Pin 38) (see temp_sense_pin)
 Connect the Data pin of the DS18x20 to a GPIO pin on the Pico (e.g., GPIO 16).
 Place the 4.7kΩ resistor between the VCC and Data pins of the DS18x20.
 
-The DS18x20 pin is specified within ``sensor.txt`` as se 
+The DS18x20 connection pin is specified within ``sensor.txt`` as ``temp_sense_pin``
