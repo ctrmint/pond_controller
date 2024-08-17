@@ -13,10 +13,10 @@ import json
 import time
 
 
-# WIFIConfiguration Constants
+# Configuration Files
 WIFI_SETTINGS_FILE = 'wifi_settings.txt'
-# PIN for I2C sensor(s)
-SENSE_PIN = 16
+SENSOR_FILE = 'sensors.txt'
+
 # Onboard sensor ref
 OPERATING_VOLTAGE = 3.3
 BIT_RANGE = 65535
@@ -31,12 +31,6 @@ led = Pin("LED", Pin.OUT)
 led.off()
 #led_green = machine.Pin(0, machine.Pin.OUT)
 #led_red = machine.Pin(1, machine.Pin.OUT)
-
-SENSOR_PLACEMENTS = {
-    "28fd93df0d000054": "Pump housing",
-    "2825d05704e13c71": "Pond",
-    "287e9d5704e13ca2": "Pond"
-}
 
 ABOUT = {"About": {"Author": "Mark Rodman", "Build": 1.0, "Documentation": "https://some.github.repo"}}
 
@@ -65,7 +59,7 @@ def external_sensors(roms, ds_sensor):
             "type": TYPE_HARDWARE,
             "value": tempC,
             "sensor": rom_to_hex(rom),
-            "location": str(get_value_from_dict(SENSOR_PLACEMENTS, rom_to_hex(rom))),
+            "location": str(get_value_from_dict(sensor_placement, rom_to_hex(rom))),
             "time": get_epoch_time(),
             "resolution_raw": get_resolution(ds_sensor, rom),
             "resolution_bits": (get_resolution(ds_sensor, rom)) * 9 + 9,
@@ -122,7 +116,7 @@ def gen_full_data():
     average_pond_temp = avg_from_json(measures, "value", "location", "Pond")
     average_pond_housing = avg_from_json(measures, "value", "location", "Pump housing")
     measures.append({"location": "Pond", "value": average_pond_temp, "type": "avg_temp", "time": get_epoch_time()})
-    print(average_pond_housing)
+    #print(average_pond_housing)
     return measures, average_pond_temp, onboard_temp_sensor.current_temp, average_pond_housing
 
 
@@ -215,7 +209,7 @@ def summary(request):
 
 @server.route("/api/sensor_placements", methods=["GET"])
 def sensor_placements(request):
-    return json.dumps({"sensor_placements": SENSOR_PLACEMENTS}), 200, {"Content-Type": "application/json"}
+    return json.dumps({"sensor_placements": sensor_placement}), 200, {"Content-Type": "application/json"}
 
 
 @server.route("/api/about", methods=["GET"])
@@ -245,40 +239,65 @@ def toggle_led(request):
     return json.dumps({"onboard LED state": led.value()}), 200, {"Content-Type": "application/json"}
 
 
+@server.route("/api/led_endpoint", methods=["GET", "POST"])
+def led_endpoint(request):
+    if request.method == 'GET':
+        state = led.value()
+        if led.value() == 0:
+            out = {"is_active": "false"}
+        elif led.value() == 1:
+            out = {"is_active": "true"}
+        else:
+            out = {"error": "true"}
+    
+    if request.method == 'POST':
+        print(request.method)
+        print(request.data)
+        out = {"method_rx": request.method}
+    
+    return json.dumps(out), 200, {"Content-Type": "application/json"}
+
+
+
+
 @server.catchall()
 def catchall(request):
     return json.dumps({"message" : "URL not found!"}), 404, {"Content-Type": "application/json"}
 
 
-# Start of main execution here
-roms = None
-# external sensor setup
-while not roms:
-    ds_sensor = init_sensor(SENSE_PIN)
-    roms = ds_sensor.scan()
-
+#### _____Start of main execution here____
 # Get Wifi setting from file
 try:
     with open(WIFI_SETTINGS_FILE, 'r') as file:
         wifi_json = json.load(file)
 except Exception as e:
     print(e)
-
-# dynamically define kv based on wifi input file
-# keys should be wifi_ssid, wifi_password, buffer_size, and port
-# see READ.me
+# dynamically define kv based on wifi input file keys should be wifi_ssid, wifi_password, buffer_size, and port
 for key, value in wifi_json.items():
     globals()[key] = value
+
+# Get Sensor details from file
+try:
+    with open(SENSOR_FILE, 'r') as file:
+        sensor_json = json.load(file)
+        for key, value in sensor_json.items():
+            globals()[key] = value
+except Exception as e:
+    print(e)
 
 try:
     ip = connect_to_wifi(wifi_ssid, wifi_password)
     #print(ip)
     time.sleep(5)
 except:
-    pass
-    #print("Failed to connect to the WiFi")
-    #print("connected to IP ", ip)
-    
+    print("Failed to connect to the WiFi")
+
+# external sensor setup
+roms = None
+while not roms:
+    ds_sensor = init_sensor(temp_sense_pin)
+    roms = ds_sensor.scan()
+
 # onboard sensor setup
 sensor_temp = machine.ADC(4)
 conversion_factor = (OPERATING_VOLTAGE / BIT_RANGE)
