@@ -1,4 +1,4 @@
-# Pond Pico Controller
+# Pond Pico Controller + Sense Hat
 ## About
 A Raspberry Pico based controller for a pond.  
 The controller provides an API for specific tasks or readings based on connected hardware.  The connected hardware must be built and connected for the software to operate correctly.   Details of the hardware are described below. 
