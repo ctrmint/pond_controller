@@ -23,3 +23,11 @@ Connect the Data pin of the DS18x20 to a GPIO pin on the Pico (e.g., GPIO 16).
 Place the 4.7kΩ resistor between the VCC and Data pins of the DS18x20.
 
 The DS18x20 connection pin is specified within ``sensor.txt`` as ``temp_sense_pin``
+
+## Installation
+* Install MicroPython on the Pico
+* Install ``Phew`` MicroPython libraries on Pico, recommend via Tools in Thonny 
+* Clone repo
+* Modify ``wifi_settings.txt`` for you SSID and password
+* Modify ``sensors.txt``, set the change the serial values of your sensors, you'll need to know these in advance
+* Upload ``main.py`` ``pico_hardware.py`` ``sensors.txt`` and ``wifi_settings.txt``
