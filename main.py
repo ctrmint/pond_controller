@@ -163,6 +163,11 @@ def onboardLED(params):
         led.on()
     if params == "off":
         led.off()
+    if params == True:
+        led.on()
+    if params == False:
+        led.off()
+        
     return
 
 ### API Endpoints
@@ -243,20 +248,16 @@ def led_endpoint(request):
     if request.method == 'GET':
         state = led.value()
         if led.value() == 0:
-            out = {"is_active": "false"}
+            out = {"active": False}
         elif led.value() == 1:
-            out = {"is_active": "true"}
+            out = {"active": True}
         else:
-            out = {"error": "true"}
-    
+            out = {"error": True}
+        
     if request.method == 'POST':
-        print(request.method)
-        print(request.data)
-        out = {"method_rx": request.method}
-    
+        onboardLED(request.data['active'])
+        out = request.data
     return json.dumps(out), 200, {"Content-Type": "application/json"}
-
-
 
 
 @server.catchall()
