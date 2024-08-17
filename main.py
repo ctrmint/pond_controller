@@ -1,8 +1,7 @@
 # Mark Rodman
 # ------------------------------------------------------
 # Description
-# Temperature measurement system, as a web service
-# Do not like this
+# Pond Controller as an API
 # ------------------------------------------------------
 from phew import server, connect_to_wifi
 import network, socket, struct, time, ubinascii
