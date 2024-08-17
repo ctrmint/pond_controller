@@ -11,7 +11,7 @@ script: !include scripts.yaml
 scene: !include scenes.yaml
 
 rest:
-  - resource: http://10.81.1.73/api/summary
+  - resource: http://picow.lan/api/summary
     sensor:
       - name: "Pond"
         unique_id: "pico_pond"
