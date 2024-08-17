@@ -1,0 +1,8 @@
+{
+    "sensor_placement": {
+        "28fd93df0d000054": "Pump housing",
+        "2825d05704e13c71": "Pond",
+        "287e9d5704e13ca2": "Pond"
+        },
+     "temp_sense_pin": 16
+}
