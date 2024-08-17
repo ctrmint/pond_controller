@@ -13,4 +13,5 @@ The following hardware items are required
 * WLAN (obviously)
 
 ### Custom Hardware
-##=# Temperature Sensors
+#### Temperature Sensors
+T.B.C
