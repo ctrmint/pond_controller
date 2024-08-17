@@ -1,0 +1,43 @@
+# HOME ASSISTANT FILE
+# Loads default set of integrations. Do not remove.
+default_config:
+
+# Load frontend themes from the themes folder
+frontend:
+  themes: !include_dir_merge_named themes
+
+automation: !include automations.yaml
+script: !include scripts.yaml
+scene: !include scenes.yaml
+
+rest:
+  - resource: http://10.81.1.73/api/summary
+    sensor:
+      - name: "Pond"
+        unique_id: "pico_pond"
+        value_template:  "{{ value_json['avg_pond'] | round(1) }}"
+        device_class: temperature
+        unit_of_measurement: "°C"
+      - name: "Housing"
+        unique_id: "pico_housing"
+        value_template:  "{{ value_json['housing'] | round(1) }}"
+        device_class: temperature
+        unit_of_measurement: "°C"
+      - name: "Pico_Onboard"
+        unique_id: "pico_onboard"
+        value_template:  "{{ value_json['onboard'] | round(1) }}"
+        device_class: temperature
+        unit_of_measurement: "°C"
+        
+# SWITCH toggling onboard led via LED_endpoint
+switch:
+  - platform: rest
+    name: pico_led
+    unique_id: pico_led_switch
+    scan_interval: 5
+    resource: http://10.81.1.73/api/led_endpoint
+    body_on: '{"active": true }'
+    body_off: '{"active": false }'
+    is_on_template: "{{ value_json.active }}"
+    headers:
+       Content-Type: application/json
